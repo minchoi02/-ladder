@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>사다리게임</title>
+<style>
+html,body{padding:0; margin:0; }
+ul,li{ padding:0; margin:0; list-style:none;}
+#div1{ display:inline-block; position:relative;}
+#div1 > ul{ display:inline-block; position:relative; width:100%;}
+#div1 > ul > li{ display:inline-block; float:left; text-align:center;}
+#div1 > ul > li > input{ width:90%; text-align:center; }
+#ladderboder{ position:relative; float:left;}
+#ladderbody{ position:relative; display:inline-block;}
+#ladderresult{ position:absolute; left:0; top:0;}
+input{ border:1px solid;}
+</style>
+<script>
+    // 인원제한
+    var maxuser = 20;
+    var linewidth = 80;
+    var svgHeight = 500;
+    var gridline = [];
+    var resultline = [];
+    var resultobj = { "user": 0, "list": [], "line": [] };
+    var linecolor = [];
+    window.onload = function () {
+        var btn1 = document.getElementById("btn1");
+        btn1.addEventListener("click", function () {
+            linecolor = [];
+            gridline = [];
+            resultline = [];
+            resultobj = { "user": 0, "list": [], "line": [] };
+            var num = document.getElementById("num").value;
+            if (num == undefined || num == "" || !Number(num)) {
+                num = 0;
+            }
+            if (num <= 1) {
+                alert("참여인원을 입력하세요.(최소 2명입니다.)");
+                document.getElementById("num").value = "";
+                document.getElementById("num").focus();
+                return;
+            }
+            if (num > maxuser) {
+                alert("참여인원은 최대 " + maxuser + "명입니다");
+                document.getElementById("num").value = "";
+                document.getElementById("num").focus();
+                return;
+            }
+            resultobj.user = num;
+            var html = [];
+            for (var i = 0; i < num; i++) {
+                // 랜덤컬러
+                var rndcolor = "#" + Math.round(Math.random() * 0xffffff).toString(16);
+                linecolor.push(rndcolor);
+                html.push("<li><input type=\"text\" style=\"border:1px solid " + rndcolor + "\" name=\"lname\" placeholder=\"이름" + (i + 1) + "\" onmouseover=\"LineResult(" + i + ")\" onmouseout=\"LineResultView()\"/></li>");
+            }
+            document.getElementById("ladderheader").innerHTML = html.join('');
+ 
+            var html = [];
+            for (var i = 0; i < num; i++) {
+                html.push("<li><input type=\"text\" name=\"litem\" placeholder=\"상품" + (i + 1) + "\"/></li>");
+            }
+            document.getElementById("ladderfooter").innerHTML = html.join('');
+            document.getElementById("resultuser").innerHTML = "";
+ 
+            var svgw = (num * linewidth);
+ 
+            document.getElementById("ladderboder").style.width = (num * linewidth) + "px";
+            document.getElementById("ladderboder").style.height = svgHeight + "px";
+            document.getElementById("ladderresult").style.width = (num * linewidth) + "px";
+            document.getElementById("ladderresult").style.height = svgHeight + "px";
+            document.getElementById("ladderresult").style.display = "none";
+ 
+            var svg = [];
+            svg.push("<svg onclick=\"XYSetting(event);\" id=\"laddersvg\" width=\"" + svgw + "\" height=\"" + svgHeight + "\">");
+            for (var i = 0; i < num; i++) {
+                var x = ((linewidth / 2) + (i * linewidth));
+                svg.push("<line x1=\"" + x + "\" y1=\"0\" x2=\"" + x + "\" y2=\"" + svgHeight + "\" stroke=\"#000\" stroke-width=\"1\"/>");
+            }
+            svg.push("</svg>");
+            var lb = document.getElementById("ladderboder");
+            lb.innerHTML = svg.join('');
+            var l = document.querySelectorAll("#div1 > ul > li");
+            l.forEach(function (el) {
+                el.style.width = linewidth + "px";
+            })
+        });
+ 
+        var btn2 = document.getElementById("btn2");
+ 
+        btn2.addEventListener("click", function () {
+            var ladderresult = document.getElementById("ladderresult");
+            ladderresult.style.display = "inline-block";
+            var rline = [];
+ 
+ 
+            for (var i = 0; i < gridline.length; i++) {
+                var ix = (gridline[i].x - 40) / linewidth;
+                rline.push({ "x1": gridline[i].x, "x2": gridline[i].x + linewidth, "y": gridline[i].y });
+                rline.push({ "x1": gridline[i].x + linewidth, "x2": gridline[i].x, "y": gridline[i].y });
+            }
+ 
+            for (var i = 0; i < resultobj.user; i++) {
+                var x = ((linewidth / 2) + (i * linewidth));
+                //                    rline.push({ "x1": x, "x2": x, "y": 0 });
+                rline.push({ "x1": x, "x2": x, "y": svgHeight });
+            }
+ 
+            rline.sort(function (a, b) {
+                return a["y"] - b["y"];
+            });
+ 
+            var svg = [];
+            svg.push("<svg id=\"ladderresultsvg\" width=\"100%\" height=\"100%\">");
+ 
+            for (var i = 0; i < resultobj.user; i++) {
+                var lcolor = linecolor[i % linecolor.length];
+                var resultusr = document.getElementsByName("lname")[i].value;
+                if (resultusr == "") {
+                    resultusr = document.getElementsByName("lname")[i].getAttribute("placeholder");
+                }
+                console.log(lcolor);
+                var linelist = [];
+                var bx = (i * linewidth) + (linewidth / 2);
+                var by = 0;
+                linelist.push({ "x": bx, "y": by });
+                for (var j = 0; j < rline.length; j++) {
+                    if (rline[j].x1 == bx && by > rline[j].y - 1) {
+                        linelist.push({ "x": bx, "y": by });
+                        linelist.push({ "x": rline[j].x2, "y": rline[j].y });
+                        svg.push("<line x1=\"" + bx + "\" y1=\"" + rline[j].y + "\" x2=\"" + rline[j].x2 + "\" y2=\"" + rline[j].y + "\" stroke=\"" + lcolor + "\" stroke-width=\"1\" data-line=\"" + i + "\"/>");
+                        bx = rline[j].x2;
+                    } else if (rline[j].x2 == bx && by > rline[j].y - 1) {
+                        linelist.push({ "x": bx, "y": by });
+                        linelist.push({ "x": rline[j].x1, "y": rline[j].y });
+                        svg.push("<line x1=\"" + rline[j].x1 + "\" y1=\"" + rline[j].y + "\" x2=\"" + bx + "\" y2=\"" + rline[j].y + "\" stroke=\"" + lcolor + "\" stroke-width=\"1\" data-line=\"" + i + "\"/>");
+                        bx = rline[j].x1;
+                    }
+                    by = rline[j].y;
+                }
+                linelist.push({ "x": bx, "y": svgHeight });
+ 
+                var ix = (bx - 40) / linewidth;
+                document.getElementsByName("litem")[ix].style.borderColor = linecolor[i];
+                document.getElementsByName("litem")[ix].setAttribute("onmouseover", "LineResult(" + i + ");");
+                document.getElementsByName("litem")[ix].setAttribute("onmouseout", "LineResultView();");
+ 
+                var itemresult = document.getElementsByName("litem")[ix].value;
+                if (itemresult == "") {
+                    itemresult = document.getElementsByName("litem")[ix].getAttribute("placeholder");
+                }
+ 
+                var html = [];
+                html.push("<p style=\"color:" + linecolor[i] + "\">" + resultusr + " → " + itemresult + "</p>");
+                resultuser.innerHTML += html.join('');
+ 
+                var bx = 0;
+                var by = 0;
+                for (var j = 0; j < linelist.length; j++) {
+                    if (j % 2 == 0) {
+                        svg.push("<line x1=\"" + linelist[j].x + "\" y1=\"" + linelist[j].y + "\" ");
+                        bx = linelist[j].x;
+                        by = linelist[j].y;
+                    } else {
+                        svg.push(" x2=\"" + linelist[j].x + "\" y2=\"" + linelist[j].y + "\" stroke=\"" + lcolor + "\" stroke-width=\"1\" data-line=\"" + i + "\"/>");
+                    }
+ 
+                }
+            }
+            svg.push("</svg>");
+            ladderresult.innerHTML = svg.join('');
+        });
+    }
+ 
+    function XYSetting(e) {
+        var lb = document.getElementById("ladderboder");
+        var svgtop = lb.getBoundingClientRect().top;
+        var x = Math.floor((e.pageX + (linewidth / 2)) / linewidth) * linewidth - (linewidth / 2);
+        var y = e.pageY - svgtop;
+        if (x > 0 && x < document.getElementById("laddersvg").clientWidth - (linewidth / 2)) {
+            var check = false;
+            var cli = 0;
+            for (var i = 0; i < gridline.length; i++) {
+                if (Number(gridline[i].x) == Number(x) && Number(gridline[i].y) == Number(y)) {
+                    check = true;
+                    cli = i;
+                }
+            }
+            if (check) {
+                gridline.splice(cli, 1);
+            } else {
+                var chk = false;
+                for (var i = 0; i < gridline.length; i++) {
+ 
+                    if (gridline[i].y == y) {
+                        chk = true;
+                    }
+                }
+                if (!chk) {
+                    gridline.push({ "x": x, "y": y });
+                }
+            }
+ 
+            var addsvg = [];
+            addsvg.push("<svg onclick=\"XYSetting(event);\" id=\"laddersvg\" width=\"" + lb.clientWidth + "\" height=\"" + svgHeight + "\">");
+            var num = (lb.clientWidth / linewidth);
+            // 기본라인
+            for (var i = 0; i < num; i++) {
+                var x = ((linewidth / 2) + (i * linewidth));
+                addsvg.push("<line x1=\"" + x + "\" y1=\"0\" x2=\"" + x + "\" y2=\"" + svgHeight + "\" stroke=\"#000\" stroke-width=\"1\"/>")
+            }
+            for (var i = 0; i < gridline.length; i++) {
+                var sx = (gridline[i].x);
+                var sy = gridline[i].y;
+                addsvg.push("<line x1=\"" + sx + "\" y1=\"" + sy + "\" x2=\"" + (sx + linewidth) + "\" y2=\"" + sy + "\" stroke=\"#000\" stroke-width=\"1\"/>")
+            }
+            addsvg.push("</svg>");
+            var lbs = document.getElementById("ladderboder");
+            lbs.innerHTML = addsvg.join('');
+        }
+    }
+ 
+    function LineResult(no) {
+        if (document.getElementById("ladderresultsvg") != undefined)
+            document.getElementById("ladderboder").style.opacity = 0;
+        var elm = document.querySelectorAll("#ladderresultsvg line");
+        for (var i = 0; i < elm.length; i++) {
+            if (elm[i].getAttribute("data-line") == no) {
+                elm[i].style.opacity = 1;
+            } else {
+                elm[i].style.opacity = 0;
+            }
+        }
+    }
+ 
+    function LineResultView() {
+        if (document.getElementById("ladderresultsvg") != undefined)
+            document.getElementById("ladderboder").style.opacity = 1;
+        var elm = document.querySelectorAll("#ladderresultsvg line");
+        for (var i = 0; i < elm.length; i++) {
+            elm[i].style.opacity = 1;
+        }
+    }
+</script>
+</head>
+<body>
+    <form>
+        <input type="number" id="num" placeholder="참여인원" />
+        <a id="btn1">참여인원</a>
+        <a id="btn2">결과확인</a>
+    </form>
+ 
+    <div id="div1">
+        <ul id="ladderheader"></ul>
+        <div id="ladderbody">
+            <div id="ladderboder"></div>
+            <div id="ladderresult"></div>
+        </div>
+        <ul id="ladderfooter"></ul>
+        <div id="resultuser"></div>
+    </div>
+</body>
+</html>
