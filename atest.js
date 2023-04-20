@@ -38,6 +38,8 @@ let sPick = Math.floor(Math.random() * sValue.length);
 console.log(sPick);
 // 5개의 값 중 랜덤으로 하나 출력됨
 */
+
+/*3.14랜덤 계산방식*/
 /*
 var pi = 0;
 var under = 1;
@@ -50,6 +52,18 @@ for(var i=0;i<10000;i++){
 
 console.log(4*pi);
 */
+
+var pi = 1;
+var under = 1;
+var type = -1;
+for(var i=0;i<10000;i++){
+    pi += type*1/under;
+    under += 3;
+    type *= -1
+}
+
+console.log(4*pi);
+
 /*
 var pi = 0;
 var under = 1;
@@ -77,7 +91,7 @@ console.log(100/pi);
 //console.timeLog(100)
 
 
-
+/*
 var numbers1 = [10, 30, 50, 70, 90];
 var numbers2 = new Array(20, 40, 60, 80, 100);
 
@@ -104,7 +118,7 @@ console.log(numbers1);
 console.log(numbers2);
 console.log(mixedArr);
 console.log(objArr[2].name, objArr[2].dept);
-
+*/
 
 /*
 const map = new Map();
