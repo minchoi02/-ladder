@@ -1,0 +1,122 @@
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @font-face { font-family: 'font'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_nine_@1.1/BBTreeGB.woff') format('woff'); font-weight: normal; font-style: normal; }
+        h1 {
+            font-family: 'font', sans-serif;
+            font-size: 25px;
+        }
+        html {
+            text-align: center;
+        }
+        input {
+            width: 80%;
+            height: 50px;
+            border: 2px solid black;
+            padding-left: 10px;
+        }
+        #id_ {
+            font-size: 20px;
+        }
+        #pass_ {
+            font-size: 20px;
+        }
+        #submit {
+            width: 200px;
+            height: 75px;
+            background-color: green;
+            color: white;
+            font-size: 30px;
+            font-family: 'font', sans-serif;
+            transition-duration: 0.5s;
+            cursor: pointer;
+        }
+        #submit:hover {
+            background-color:lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="font-size: 2em;">JavaScript기반으로 로그인정보 전송 테스트(LOGIN)</h1>
+
+    <h1>아이디</h1>
+
+    <form id="idform">
+        <input type="id" name="id" id="id_" placeholder="아이디를 입력해주세요...">
+    </form>
+
+    <h1>패스워드</h1>
+
+    <form id="passform">
+        <input type="password" name="pass" id="pass_" placeholder="비밀번호를 입력해주세요...">
+    </form>
+    <br>
+    <br>
+
+    <button id="submit">로그인</button>
+
+    <!--JAVASCRIPT START
+    <script> 
+        document.getElementById('submit').onclick = function() {
+            var ID = document.getElementById('id_').value;
+            var pass = document.getElementById('pass_').value;
+            if (ID === "admin" && pass === "1234") {
+                alert("로그인 성공!");
+            }
+            else {
+                alert("로그인 실패!");
+            }
+        }
+    </script>
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>signinPage</title>
+  </head>
+  <body>
+    JavaScript기반으로 로그인정보 전송 테스트(LOGIN)
+    <br>
+    아이디 : <input type="text" placeholder="ID를 입력하세요" id="userid"><br> 
+    비밀번호 : <input type="password" placeholder="비밀번호" id="userpw">
+    <input type="button" value="로그인" id="signinButton">
+
+
+  </body>
+  
+  <script type="text/javascript">
+    console.log("fighting!");
+    console.log(document); // html 태그 전체를 콘솔에 띄워주자.
+
+    var signinButton = document.getElementById("signinButton") // 버튼을 만들고.
+    signinButton.addEventListener('click', signinFunc) // 'click'이란 id의 버튼을 누르면 signinFunc 함수를 실행.
+
+    function signinFunc () {
+      var userid = document.getElementById("userid").value; // userid 의 값을 받아와 넣음.
+      var userpw = document.getElementById("userpw").value; // userpw 의 값을 받아와 넣음.
+
+
+      if(userid == "admin" && userpw == "12345678") {
+        alert("로그인 성공");
+        console.log("로그인 성공했습니다.");
+      } else {
+        alert("로그인 실패");
+        console.log("로그인 실패했습니다.");
+      }
+
+
+    }
+
+  </script>
+
+
+</html>
